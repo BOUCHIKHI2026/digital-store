@@ -1,0 +1,1530 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>متجر الاشتراكات الرقمية الاحترافي | Gemini Pro & Canva Pro</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Complete Standalone Fallback Styles (Works 100% Offline in Chrome even without Internet) */
+    *, *::before, *::after { box-sizing: border-box; }
+    html { direction: rtl; scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #090d16;
+      color: #f8fafc;
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+    button, input {
+      font-family: inherit;
+    }
+    .glass-card {
+      background: rgba(15, 23, 42, 0.82);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 1.25rem;
+    }
+    .product-card {
+      transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+    }
+    .product-card:hover {
+      transform: translateY(-4px);
+    }
+    .product-card.selected {
+      border-color: #6366f1 !important;
+      box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.4), 0 20px 40px -15px rgba(99, 102, 241, 0.3);
+      background: linear-gradient(145deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.98));
+    }
+    .gradient-text {
+      color: #a5b4fc;
+      background: linear-gradient(135deg, #818cf8 0%, #c084fc 50%, #38bdf8 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: inline-block;
+    }
+    /* Mobile & touch screen optimizations */
+    @media (max-width: 640px) {
+      .glass-card {
+        border-radius: 1rem;
+      }
+      input, button {
+        font-size: 16px; /* Prevents automatic zoom on iOS Safari */
+      }
+    }
+    .shimmer-badge {
+      background: linear-gradient(90deg, rgba(99,102,241,0.18) 0%, rgba(168,85,247,0.28) 50%, rgba(99,102,241,0.18) 100%);
+    }
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 0.75; }
+    }
+    .glow-orb {
+      animation: pulseGlow 6s ease-in-out infinite;
+    }
+    /* Offline fallback layout helpers in case Tailwind CDN is unreachable */
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white relative">
+
+  <!-- Background Ambient Glow -->
+  <div class="fixed inset-0 pointer-events-none overflow-hidden z-0">
+    <div class="glow-orb absolute -top-32 -right-32 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl"></div>
+    <div class="glow-orb absolute top-1/3 -left-32 w-96 h-96 bg-purple-600/15 rounded-full blur-3xl"></div>
+    <div class="glow-orb absolute -bottom-32 right-1/4 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl"></div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toastContainer" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 pointer-events-none w-full max-w-md px-4"></div>
+
+  <!-- Shopping Cart Modal / Drawer (Opens when clicking the Cart button) -->
+  <div id="cartModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/75 backdrop-blur-sm p-3 sm:p-4 overflow-y-auto">
+    <div class="glass-card w-full max-w-lg rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-slate-700/90 shadow-2xl max-h-[92vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-5">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+          </div>
+          <div>
+            <h3 class="text-lg font-extrabold text-white">سلة المشتريات</h3>
+            <p class="text-xs text-slate-400">يمكنك تعديل الكمية أو إضافة أكثر من منتوج بحرية</p>
+          </div>
+        </div>
+        <button id="closeCartModalBtn" type="button" class="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800 transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- Modal Cart Items List -->
+      <div id="modalCartItemsList" class="space-y-3 max-h-72 overflow-y-auto pr-1"></div>
+
+      <!-- Modal Cart Total & Actions -->
+      <div class="mt-6 pt-4 border-t border-slate-800">
+        <div class="flex items-center justify-between mb-4 bg-slate-900/90 border border-slate-800 rounded-2xl p-4">
+          <span class="text-sm font-bold text-slate-300">المجموع النهائي للسلة:</span>
+          <span id="modalCartTotalPrice" class="text-2xl font-black text-emerald-400">0 درهم مغربي</span>
+        </div>
+        <div class="flex items-center justify-between gap-3">
+          <button id="clearCartBtn" type="button" class="px-4 py-2.5 rounded-xl border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 text-xs sm:text-sm font-bold transition">
+            إفراغ السلة
+          </button>
+          <button id="proceedFromCartBtn" type="button" class="flex-1 py-2.5 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-extrabold transition shadow-lg shadow-indigo-600/30">
+            متابعة لإرسال الطلب عبر واتساب
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PIN-Protected Settings Modal for Seller Customization -->
+  <div id="sellerSettingsModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/75 backdrop-blur-sm p-3 sm:p-4 overflow-y-auto">
+    <div class="glass-card w-full max-w-lg rounded-2xl p-4 sm:p-6 border border-slate-700/80 shadow-2xl max-h-[92vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-5">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-lg bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-white">لوحة تحكم البائع (فتح قفل الإعدادات)</h3>
+            <p class="text-xs text-slate-400">لتغيير الحساب البنكي وكود التفعيل السري والرقم السري</p>
+          </div>
+        </div>
+        <button id="closeSettingsBtn" type="button" class="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800 transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- Step A: Seller PIN Gate Screen (Shown before accessing settings) -->
+      <div id="sellerPinGateView" class="space-y-4 py-2">
+        <div class="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 text-center">
+          <div class="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-400 mx-auto flex items-center justify-center mb-3">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"/></svg>
+          </div>
+          <h4 id="pinGateTitle" class="text-base font-extrabold text-white mb-1">منطقة خاصة بالبائع فقط (محمية)</h4>
+          <p id="pinGateSubtitle" class="text-xs text-slate-400 mb-4">أدخل الرقم السري الخاص بالإدارة للدخول إلى لوحة التحكم.</p>
+
+          <div class="max-w-xs mx-auto space-y-3">
+            <div class="relative">
+              <input
+                id="sellerPinInput"
+                type="password"
+                dir="ltr"
+                placeholder="••••••••"
+                class="w-full rounded-xl bg-slate-950 border border-slate-700 focus:border-amber-500 px-4 py-3 text-white font-mono font-bold text-center text-lg tracking-widest outline-none transition"
+              />
+            </div>
+            <p id="sellerPinErrorMsg" class="text-xs text-rose-400 font-bold hidden">الرقم السري غير صحيح! هذه المنطقة مخصصة للبائع فقط.</p>
+            <button
+              id="unlockSellerSettingsBtn"
+              type="button"
+              class="w-full py-3 px-5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-sm transition shadow-lg shadow-amber-500/25 flex items-center justify-center gap-2"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"/></svg>
+              <span>دخول إلى إعدادات البائع</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step B: Unlocked Seller Configuration Form (Hidden until PIN verified) -->
+      <div id="sellerConfigFormView" class="hidden">
+        <div class="mb-4 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2 text-xs font-bold text-emerald-300">
+            <span>🔓 القفل مفتوح الآن — يمكنك تعديل معطياتك البنكية والرقم السري</span>
+          </div>
+          <button id="lockSettingsViewBtn" type="button" class="text-xs px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold transition shrink-0">
+            🔒 إغلاق القفل
+          </button>
+        </div>
+
+        <div class="space-y-4 text-sm">
+          <!-- Section 1: Secret Activation Code for Buyers -->
+          <div class="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30">
+            <label class="block text-amber-300 font-extrabold mb-1.5" for="cfgSecretCode">🔑 1. الكود السري للتفعيل (الذي ترسله للمشتري لإظهار البنك):</label>
+            <input id="cfgSecretCode" type="text" dir="ltr" class="w-full rounded-xl bg-slate-950 border border-amber-500/40 px-3.5 py-2.5 text-amber-300 font-mono font-bold text-base focus:outline-none focus:border-amber-400" placeholder="مثال: PRO2026" />
+            <span class="text-[11px] text-slate-300 block mt-1">عندما يضع المشتري هذا الكود في الصفحة ويضغط على "التحقق من الكود"، ستظهر له معطياتك البنكية أسفله.</span>
+          </div>
+
+          <!-- Section 2: Bank Account Details -->
+          <div class="p-4 rounded-2xl bg-emerald-950/30 border border-emerald-500/30 space-y-3">
+            <div class="text-emerald-300 font-extrabold text-sm">🏦 2. معطيات الحساب البنكي للبائع:</div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-slate-300 font-semibold mb-1" for="cfgBankHolder">الاسم الكامل لصاحب الحساب:</label>
+                <input id="cfgBankHolder" type="text" placeholder="أدخل اسمك الكامل..." class="w-full rounded-xl bg-slate-950 border border-slate-700 px-3.5 py-2.5 text-white focus:outline-none focus:border-emerald-500" />
+              </div>
+              <div>
+                <label class="block text-slate-300 font-semibold mb-1" for="cfgBankName">اسم البنك:</label>
+                <input id="cfgBankName" type="text" placeholder="مثال: بنك CIH أو التجاري وفا بنك..." class="w-full rounded-xl bg-slate-950 border border-slate-700 px-3.5 py-2.5 text-white focus:outline-none focus:border-emerald-500" />
+              </div>
+            </div>
+            <div>
+              <label class="block text-slate-300 font-semibold mb-1" for="cfgBankRib">رقم الحساب البنكي (RIB / IBAN):</label>
+              <input id="cfgBankRib" type="text" dir="ltr" placeholder="230 780 0000000000000000 00" class="w-full rounded-xl bg-slate-950 border border-slate-700 px-3.5 py-2.5 text-emerald-400 font-mono font-bold focus:outline-none focus:border-emerald-500" />
+            </div>
+          </div>
+
+          <!-- Section 3: Seller WhatsApp & PIN Lock -->
+          <div class="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3">
+            <div class="text-indigo-300 font-extrabold text-sm">⚙️ 3. رقم واتساب البائع والرقم السري لقفل الإعدادات:</div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-slate-300 font-semibold mb-1" for="cfgSellerPhone">رقم واتساب البائع (مع رمز الدولة):</label>
+                <input id="cfgSellerPhone" type="text" dir="ltr" class="w-full rounded-xl bg-slate-950 border border-slate-700 px-3.5 py-2 text-white font-mono focus:outline-none focus:border-indigo-500" placeholder="212600000000" />
+              </div>
+              <div>
+                <label class="block text-slate-300 font-semibold mb-1" for="cfgSellerPin">الرقم السري الجديد لقفل الإعدادات:</label>
+                <div class="relative flex items-center">
+                  <input id="cfgSellerPin" type="text" dir="ltr" class="w-full rounded-xl bg-slate-950 border border-indigo-500/50 px-3.5 py-2 text-indigo-300 font-mono font-bold focus:outline-none focus:border-indigo-400" placeholder="1234" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons: Clear, Reset, Save & Save+Download -->
+        <div class="mt-6 pt-4 border-t border-slate-800 space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <!-- Clear All Fields to Type Fresh Bank & PIN Details -->
+            <button id="clearFieldsForNewDataBtn" type="button" class="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl border border-slate-700 bg-slate-800/90 hover:bg-slate-700 text-slate-200 text-xs font-bold transition">
+              <svg class="w-4 h-4 text-rose-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+              <span>تفريغ الحقول لكتابة بيانات جديدة</span>
+            </button>
+
+            <!-- Reset to Factory Defaults & Focus on Bank/PIN -->
+            <button id="resetSettingsBtn" type="button" class="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 text-xs font-bold transition">
+              <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+              <span>إعادة الضبط الافتراضي (1234)</span>
+            </button>
+          </div>
+
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+            <button id="saveSettingsBtn" type="button" class="flex-1 py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-extrabold transition shadow-lg shadow-indigo-600/30">
+              ✓ حفظ المعطيات البنكية والرقم السري فوراً
+            </button>
+            <button id="saveAndDownloadSettingsBtn" type="button" class="flex-1 py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-extrabold transition shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-1.5">
+              <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+              <span>حفظ وتحميل النسخة المحدثة (.html)</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Header -->
+  <header class="relative z-20 border-b border-slate-800/80 bg-slate-950/85 backdrop-blur-md sticky top-0">
+    <div class="max-w-6xl mx-auto px-3 sm:px-6 py-2.5 sm:py-3 flex flex-wrap items-center justify-between gap-2.5">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-sky-500 flex items-center justify-center shadow-lg shadow-indigo-500/25 shrink-0">
+          <svg class="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        </div>
+        <div>
+          <span class="font-extrabold text-sm sm:text-lg tracking-tight text-white block leading-tight">ديجيتال برو</span>
+          <span class="text-[10px] sm:text-xs text-slate-400 block">بوابة الاشتراكات الرقمية الموثوقة</span>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-end gap-1.5 sm:gap-2.5 w-full sm:w-auto">
+        <!-- Header Interactive Shopping Cart Button -->
+        <button id="openCartModalBtn" type="button" class="flex-1 sm:flex-initial justify-center inline-flex items-center gap-1.5 text-xs sm:text-sm font-extrabold px-2.5 sm:px-3.5 py-2 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-200 border border-indigo-500/40 transition shadow-sm">
+          <div class="relative flex items-center shrink-0">
+            <svg class="w-4 h-4 sm:w-5 sm:h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+            <span id="headerCartCountBadge" class="bg-emerald-500 text-slate-950 text-[10px] sm:text-[11px] font-black px-1.5 py-0.2 rounded-full mr-1">0</span>
+          </div>
+          <span class="whitespace-nowrap">سلة المشتريات</span>
+          <span id="headerCartTotalBadge" class="px-1.5 sm:px-2 py-0.5 rounded-lg bg-slate-900/90 text-emerald-400 font-black text-[11px] sm:text-xs border border-slate-700 whitespace-nowrap">0 درهم مغربي</span>
+        </button>
+
+        <!-- Direct HTML Download Button for Google Chrome (Hidden inside Seller Panel or kept clean) -->
+        <button id="downloadStandaloneHtmlBtn" type="button" class="hidden items-center justify-center gap-1 text-xs font-bold px-2.5 sm:px-3 py-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 transition shrink-0" title="تحميل الصفحة بصيغة HTML لفتحها مباشرة في جوجل كروم">
+          <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          <span class="text-[11px] sm:text-xs whitespace-nowrap">تحميل لمتصفح كروم (.html)</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="relative z-10 flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-8 sm:py-12">
+    
+    <!-- Hero Section -->
+    <div class="text-center max-w-3xl mx-auto mb-10">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full shimmer-badge border border-indigo-500/30 text-indigo-300 text-xs font-bold mb-4">
+        <span>✨ إمكانية اختيار منتوج واحد أو عدة منتوجات في نفس السلة</span>
+      </div>
+      <h1 class="text-3xl sm:text-5xl font-black text-white leading-tight mb-4">
+        ارتقِ بإنتاجيتك مع أقوى أدوات <span class="gradient-text">الذكاء الاصطناعي والتصميم</span>
+      </h1>
+      <p class="text-slate-400 text-sm sm:text-base leading-relaxed">
+        أضف كل ما تريده من باقات <strong class="text-slate-200">Gemini Pro</strong> و <strong class="text-slate-200">Canva Pro</strong> إلى سلة مشترياتك، وراجع المجموع النهائي، ثم أرسل طلبك عبر واتساب للحصول على كود التفعيل وإظهار الحساب البنكي.
+      </p>
+    </div>
+
+    <!-- Step Indicator -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-4 max-w-3xl mx-auto mb-8 sm:mb-10">
+      <div class="glass-card rounded-xl p-3 flex items-center gap-3 border-indigo-500/40">
+        <div class="w-7 h-7 rounded-full bg-indigo-600 text-white font-bold text-xs flex items-center justify-center shrink-0">1</div>
+        <div class="text-xs sm:text-sm font-bold text-white leading-snug">إضافة المنتوجات للسلة</div>
+      </div>
+      <div class="glass-card rounded-xl p-3 flex items-center gap-3">
+        <div class="w-7 h-7 rounded-full bg-emerald-600 text-white font-bold text-xs flex items-center justify-center shrink-0">2</div>
+        <div class="text-xs sm:text-sm font-bold text-slate-200 leading-snug">طلب الكود عبر واتساب</div>
+      </div>
+      <div class="glass-card rounded-xl p-3 flex items-center gap-3">
+        <div class="w-7 h-7 rounded-full bg-amber-500 text-slate-950 font-bold text-xs flex items-center justify-center shrink-0">3</div>
+        <div class="text-xs sm:text-sm font-bold text-slate-200 leading-snug">إدخال الكود وإظهار البنك</div>
+      </div>
+    </div>
+
+    <!-- Step 1: Product Cards (Multi-select enabled) -->
+    <section aria-labelledby="productsHeading" class="mb-10">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-5">
+        <h2 id="productsHeading" class="text-xl sm:text-2xl font-extrabold text-white flex items-center gap-2">
+          <span class="w-2.5 h-6 rounded-full bg-indigo-500 inline-block"></span>
+          1. اختر المنتوجات التي تريد شراءها (يمكنك اختيار أكثر من منتوج)
+        </h2>
+        <div class="flex items-center gap-2">
+          <button id="selectAllProductsBtn" type="button" class="text-xs font-bold px-3 py-1.5 rounded-lg bg-indigo-500/15 hover:bg-indigo-500/25 text-indigo-300 border border-indigo-500/30 transition">
+            + إضافة كل المنتوجات للسلة
+          </button>
+        </div>
+      </div>
+
+      <div id="productsGrid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <!-- Product 1: Gemini Pro Personal (100d) - Unselected initially so cart starts at 0 DH -->
+        <div data-product-id="gemini-personal" class="product-card glass-card rounded-2xl p-6 cursor-pointer relative flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between gap-2 mb-4">
+              <span class="px-3 py-1 rounded-full text-xs font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">حساب خاص ومستقل</span>
+              <div class="w-6 h-6 rounded-lg border-2 border-slate-600 flex items-center justify-center check-indicator">
+                <svg class="w-3.5 h-3.5 text-white hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+              </div>
+            </div>
+
+            <!-- Gemini Visual Banner with 18 Months + 5TB + Google Tools IA -->
+            <div class="relative rounded-2xl overflow-hidden mb-4 p-4 bg-gradient-to-br from-indigo-950 via-indigo-900/80 to-purple-950 border border-indigo-500/40 shadow-inner">
+              <div class="flex items-center gap-3.5 mb-3">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 flex items-center justify-center shadow-md shrink-0">
+                  <svg class="w-7 h-7 text-white" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C12.5 7.5 16.5 11.5 22 12C16.5 12.5 12.5 16.5 12 22C11.5 16.5 7.5 12.5 2 12C7.5 11.5 11.5 7.5 12 2Z"/>
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="text-lg font-extrabold text-white">جيميني برو الشخصي</h3>
+                  <p class="text-xs text-indigo-200">Gemini Advanced Pro - فردي</p>
+                </div>
+              </div>
+              <div class="p-2.5 rounded-xl bg-slate-950/75 border border-indigo-400/30 text-center">
+                <p class="text-xs font-extrabold text-amber-300 leading-relaxed">
+                  🌟 عرض صالح لمدة 18 شهرا + 5To سعة تخزين سحابي وتفعيل باقة Google Tools IA
+                </p>
+              </div>
+            </div>
+
+            <div class="my-4 p-4 rounded-xl bg-slate-900/80 border border-slate-800 flex items-baseline justify-between">
+              <span class="text-xs text-slate-400">ثمن الوحدة:</span>
+              <div class="flex items-baseline gap-1">
+                <span class="text-3xl font-black text-white">100</span>
+                <span class="text-sm font-bold text-indigo-400">درهم مغربي (DH)</span>
+              </div>
+            </div>
+
+            <ul class="space-y-2.5 text-xs sm:text-sm text-slate-300 mb-6">
+              <li class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                <span>عرض صالح لمدة 18 شهراً كاملة بضمان شامل</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                <span>5To سعة تخزين سحابي + تفعيل باقة Google Tools IA</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                <span>تفعيل رسمي على بريدك الشخصي بخصوصية تامة</span>
+              </li>
+            </ul>
+          </div>
+
+          <button type="button" class="select-btn w-full py-2.5 rounded-xl font-bold text-sm transition bg-slate-800 hover:bg-slate-700 text-slate-200">
+            + أضف إلى السلة
+          </button>
+        </div>
+
+        <!-- Product 2: Gemini Pro Family (50d) -->
+        <div data-product-id="gemini-family" class="product-card glass-card rounded-2xl p-6 cursor-pointer relative flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between gap-2 mb-4">
+              <span class="px-3 py-1 rounded-full text-xs font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">الأكثر توفيراً</span>
+              <div class="w-6 h-6 rounded-lg border-2 border-slate-600 flex items-center justify-center check-indicator">
+                <svg class="w-3.5 h-3.5 text-white hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+              </div>
+            </div>
+
+            <!-- Gemini Family Visual Banner with 18 Months + 5TB + Google Tools IA -->
+            <div class="relative rounded-2xl overflow-hidden mb-4 p-4 bg-gradient-to-br from-purple-950 via-fuchsia-900/70 to-slate-950 border border-purple-500/40 shadow-inner">
+              <div class="flex items-center gap-3.5 mb-3">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 via-fuchsia-500 to-pink-600 flex items-center justify-center shadow-md shrink-0">
+                  <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="text-lg font-extrabold text-white">جيميني برو العائلي</h3>
+                  <p class="text-xs text-purple-200">Gemini Pro - ضمن مجموعة عائلية</p>
+                </div>
+              </div>
+              <div class="p-2.5 rounded-xl bg-slate-950/75 border border-purple-400/30 text-center">
+                <p class="text-xs font-extrabold text-amber-300 leading-relaxed">
+                  🌟 عرض صالح لمدة 18 شهرا + 5To سعة تخزين سحابي وتفعيل باقة Google Tools IA
+                </p>
+              </div>
+            </div>
+
+            <div class="my-4 p-4 rounded-xl bg-slate-900/80 border border-slate-800 flex items-baseline justify-between">
+              <span class="text-xs text-slate-400">ثمن الوحدة:</span>
+              <div class="flex items-baseline gap-1">
+                <span class="text-3xl font-black text-white">50</span>
+                <span class="text-sm font-bold text-purple-400">درهم مغربي (DH)</span>
+              </div>
+            </div>
+
+            <ul class="space-y-2.5 text-xs sm:text-sm text-slate-300 mb-6">
+              <li class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                <span>عرض صالح لمدة 18 شهراً كاملة عبر دعوة رسمية</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                <span>5To سعة تخزين سحابي + تفعيل باقة Google Tools IA</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                <span>محادثاتك وملفاتك مستقلة ومحمية بالكامل بنصف التكلفة</span>
+              </li>
+            </ul>
+          </div>
+
+          <button type="button" class="select-btn w-full py-2.5 rounded-xl font-bold text-sm transition bg-slate-800 hover:bg-slate-700 text-slate-200">
+            + أضف إلى السلة
+          </button>
+        </div>
+
+        <!-- Product 3: Canva Pro (20d) -->
+        <div data-product-id="canva-pro" class="product-card glass-card rounded-2xl p-6 cursor-pointer relative flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between gap-2 mb-4">
+              <span class="px-3 py-1 rounded-full text-xs font-bold bg-sky-500/20 text-sky-300 border border-sky-500/30">للمصممين وصناع المحتوى</span>
+              <div class="w-6 h-6 rounded-lg border-2 border-slate-600 flex items-center justify-center check-indicator">
+                <svg class="w-3.5 h-3.5 text-white hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+              </div>
+            </div>
+
+            <div class="relative rounded-2xl overflow-hidden mb-4 p-4 bg-gradient-to-br from-sky-950 via-cyan-900/60 to-slate-950 border border-sky-500/30 shadow-inner">
+              <div class="flex items-center gap-3.5 mb-3">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-cyan-400 via-sky-500 to-blue-600 flex items-center justify-center shadow-md shrink-0">
+                  <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="text-lg font-extrabold text-white">كانفا برو الاحترافي</h3>
+                  <p class="text-xs text-sky-200">Canva Pro - وصول كامل للمكتبة</p>
+                </div>
+              </div>
+              <div class="p-2.5 rounded-xl bg-slate-950/75 border border-sky-400/25 text-center">
+                <p class="text-xs font-extrabold text-sky-300 leading-relaxed">
+                  🎨 وصول غير محدود لجميع القوالب الاحترافية وأدوات الذكاء الاصطناعي
+                </p>
+              </div>
+            </div>
+
+            <div class="my-4 p-4 rounded-xl bg-slate-900/80 border border-slate-800 flex items-baseline justify-between">
+              <span class="text-xs text-slate-400">ثمن الوحدة:</span>
+              <div class="flex items-baseline gap-1">
+                <span class="text-3xl font-black text-white">20</span>
+                <span class="text-sm font-bold text-sky-400">درهم مغربي (DH)</span>
+              </div>
+            </div>
+
+            <ul class="space-y-2.5 text-xs sm:text-sm text-slate-300 mb-6">
+              <li class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                <span>أكثر من 100 مليون قالب وصورة وعنصر بريميوم</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                <span>إزالة الخلفية بضغطة واحدة وأدوات Magic Studio</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                <span>تصدير التصاميم والفيديوهات بأعلى جودة وبدون علامة</span>
+              </li>
+            </ul>
+          </div>
+
+          <button type="button" class="select-btn w-full py-2.5 rounded-xl font-bold text-sm transition bg-slate-800 hover:bg-slate-700 text-slate-200">
+            + أضف إلى السلة
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Collapsible / Interactive On-Page Shopping Cart Bar -->
+    <section class="mb-10">
+      <div class="glass-card rounded-3xl border border-indigo-500/40 overflow-hidden shadow-xl">
+        <!-- Clickable Cart Bar Header -->
+        <button id="toggleInlineCartBtn" type="button" class="w-full p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 sm:gap-4 bg-gradient-to-l from-indigo-950/60 via-slate-900/90 to-slate-900/90 hover:bg-indigo-950/70 transition text-right">
+          <div class="flex items-start sm:items-center gap-3 w-full sm:w-auto">
+            <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center shadow-lg shadow-indigo-600/30 relative shrink-0">
+              <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+              <span id="inlineCartCountBadge" class="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-emerald-400 text-slate-950 font-black text-xs flex items-center justify-center shadow">0</span>
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                <h3 class="text-base sm:text-xl font-extrabold text-white">سلة المشتريات</h3>
+                <span class="text-[11px] sm:text-xs px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-semibold">اضغط لعرض أو إخفاء التفاصيل</span>
+              </div>
+              <p id="inlineCartSummarySubtitle" class="text-xs sm:text-sm text-slate-300 mt-1 break-words leading-relaxed">لم يتم اختيار أي منتوج بعد — اختر باقتك من الأعلى</p>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-auto pt-2.5 sm:pt-0 border-t border-slate-800/80 sm:border-0">
+            <div class="text-right sm:text-left">
+              <span class="text-xs text-slate-400 block">المجموع النهائي:</span>
+              <span id="inlineCartTotalPrice" class="text-xl sm:text-3xl font-black text-emerald-400">0 درهم مغربي</span>
+            </div>
+            <div id="inlineCartChevron" class="w-9 h-9 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 transition-transform duration-300 rotate-180 shrink-0">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </div>
+          </div>
+        </button>
+
+        <!-- Expandable Cart Body -->
+        <div id="inlineCartDrawerBody" class="p-5 sm:p-6 border-t border-slate-800/90 bg-slate-950/60">
+          <div id="inlineCartItemsContainer" class="space-y-3 mb-4"></div>
+          <div class="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-slate-800/80 text-xs sm:text-sm">
+            <span class="text-slate-400">💡 يمكنك النقر على أي بطاقة منتوج أعلاه لإضافته أو التحكم في الكمية من هنا مباشرة.</span>
+            <div class="flex items-center gap-2">
+              <span class="text-slate-300 font-bold">إجمالي المبلغ المطلوب أداؤه:</span>
+              <strong id="inlineCartFooterTotal" class="text-xl font-black text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-xl border border-emerald-500/20">0 درهم مغربي</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Step 2 & Step 3 Grid -->
+    <div id="checkoutSection" class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      
+      <!-- Step 2: Buyer Info & WhatsApp Trigger (7 columns on desktop) -->
+      <section class="lg:col-span-7 glass-card rounded-3xl p-6 sm:p-8 border border-slate-800 shadow-xl">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 font-black flex items-center justify-center">2</div>
+          <div>
+            <h2 class="text-xl font-extrabold text-white">بيانات المشتري وطلب كود التفعيل</h2>
+            <p class="text-xs text-slate-400">أدخل رقم هاتفك واضغط على زر واتساب لمراسلة البائع والحصول على الكود السري</p>
+          </div>
+        </div>
+
+        <!-- Selected Products Summary Box -->
+        <div class="p-4 rounded-2xl bg-indigo-950/40 border border-indigo-500/30 mb-6 flex flex-wrap items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-indigo-600/30 border border-indigo-400/30 flex items-center justify-center text-indigo-300 font-bold shrink-0">
+              🛒
+            </div>
+            <div>
+              <span class="text-xs text-indigo-300 block">المنتوجات المختارة في السلة:</span>
+              <strong id="summaryProductName" class="text-white text-sm sm:text-base font-extrabold block">لم يتم اختيار أي منتوج بعد</strong>
+            </div>
+          </div>
+          <div class="text-left shrink-0">
+            <span class="text-xs text-slate-400 block">المجموع النهائي:</span>
+            <span id="summaryProductPrice" class="text-2xl font-black text-emerald-400">0 درهم مغربي</span>
+          </div>
+        </div>
+
+        <!-- Buyer Phone Input -->
+        <div class="mb-6">
+          <label for="buyerPhoneInput" class="block text-sm font-bold text-slate-200 mb-2">
+            رقم هاتف المشتري <span class="text-rose-400">*</span>
+          </label>
+          <div class="relative">
+            <input
+              id="buyerPhoneInput"
+              type="tel"
+              dir="ltr"
+              placeholder="06 00 00 00 00"
+              class="w-full rounded-2xl bg-slate-900/90 border border-slate-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 px-4 py-3.5 text-white font-semibold text-base placeholder:text-slate-600 transition outline-none text-right sm:text-left"
+            />
+          </div>
+          <p id="phoneErrorMsg" class="text-xs text-rose-400 mt-2 hidden">المرجو إدخال رقم هاتفك الصحيح قبل إرسال الطلب عبر واتساب.</p>
+        </div>
+
+        <!-- Live WhatsApp Message Preview -->
+        <div class="mb-6">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold text-slate-400">معاينة الرسالة التلقائية التي ستصل للبائع:</span>
+            <span class="text-[11px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">تتحدث تلقائياً مع السلة</span>
+          </div>
+          <div class="p-4 rounded-2xl bg-slate-950/90 border border-slate-800/90 text-sm text-slate-200 leading-relaxed font-medium relative">
+            <p id="whatsappPreviewText" class="break-words"></p>
+          </div>
+        </div>
+
+        <!-- WhatsApp Action Button -->
+        <button
+          id="sendWhatsappBtn"
+          type="button"
+          class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-emerald-600 to-green-500 hover:from-emerald-500 hover:to-green-400 text-white font-extrabold text-base sm:text-lg shadow-xl shadow-emerald-600/25 flex items-center justify-center gap-3 transition transform active:scale-[0.99]"
+        >
+          <svg class="w-6 h-6 fill-current shrink-0" viewBox="0 0 24 24">
+            <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.274.072.376-.043c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.1.824zm-3.423-14.416c-6.627 0-12 5.373-12 12 0 2.625.846 5.059 2.284 7.033l-1.492 5.451 5.601-1.469c1.908 1.258 4.191 1.985 6.647 1.985 6.627 0 12-5.373 12-12s-5.373-12-12-12z"/>
+          </svg>
+          <span>إرسال الطلب عبر واتساب وطلب كود التفعيل</span>
+        </button>
+      </section>
+
+      <!-- Step 3: Code Verification & Protected Bank Details (5 columns on desktop) -->
+      <section class="lg:col-span-5 glass-card rounded-3xl p-6 sm:p-8 border border-slate-800 shadow-xl relative overflow-hidden">
+        <div class="flex items-center justify-between gap-2 mb-6">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/30 text-amber-400 font-black flex items-center justify-center">3</div>
+            <div>
+              <h2 class="text-xl font-extrabold text-white">التحقق من الكود السري</h2>
+              <p class="text-xs text-slate-400">المعطيات البنكية للبائع مخفية ولا تظهر إلا بعد إدخال الكود المرسل من البائع</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Secret Code Input Form (No visible code on page; buyer must enter the code received from seller) -->
+        <div class="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 mb-6">
+          <label for="secretCodeInput" class="block text-xs font-bold text-slate-300 mb-2">
+            ضع كود التفعيل الذي أرسله لك البائع عبر الواتساب:
+          </label>
+          <div class="flex flex-col sm:flex-row gap-2.5">
+            <input
+              id="secretCodeInput"
+              type="text"
+              dir="ltr"
+              placeholder="أدخل الكود المرسل من البائع..."
+              class="w-full sm:flex-1 rounded-xl bg-slate-950 border border-slate-700 focus:border-amber-500 px-3.5 py-3 sm:py-2.5 text-white font-mono font-bold text-center tracking-widest uppercase outline-none transition"
+            />
+            <button
+              id="verifyCodeBtn"
+              type="button"
+              class="w-full sm:w-auto px-5 py-3 sm:py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-sm transition shrink-0 shadow-lg shadow-amber-500/20"
+            >
+              التحقق من الكود
+            </button>
+          </div>
+          <p id="codeFeedbackMsg" class="text-xs mt-2.5 hidden"></p>
+        </div>
+
+        <!-- Locked State Placeholder (Visible before verification) -->
+        <div id="bankLockedBox" class="rounded-2xl border border-dashed border-slate-700 bg-slate-950/60 p-6 text-center">
+          <div class="w-14 h-14 rounded-2xl bg-slate-900 border border-slate-800 mx-auto flex items-center justify-center text-slate-500 mb-3">
+            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+          </div>
+          <h3 class="text-sm font-bold text-slate-300 mb-1">المعطيات البنكية للبائع محمية ومخفية</h3>
+          <p class="text-xs text-slate-500 leading-relaxed">
+            بعد مراسلة البائع عبر زر الواتساب، سيبعث لك كود التفعيل. ضع الكود في الخانة أعلاه واضغط على زر التحقق لإظهار الاسم والبنك ورقم الحساب البنكي.
+          </p>
+        </div>
+
+        <!-- Unlocked State: Seller Bank Details (Hidden until verified) -->
+        <div id="bankUnlockedBox" class="hidden rounded-2xl border border-emerald-500/40 bg-gradient-to-b from-emerald-950/40 to-slate-900/95 p-5 shadow-2xl">
+          <div class="flex items-center justify-between border-b border-emerald-500/20 pb-3 mb-4">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs font-bold">✓</span>
+              <h3 class="text-sm font-extrabold text-emerald-300">تم التحقق بنجاح! المعطيات البنكية للبائع:</h3>
+            </div>
+            <div class="flex items-center gap-3">
+              <button id="lockAgainBtn" type="button" class="text-[11px] text-slate-400 hover:text-slate-200 underline">إخفاء</button>
+            </div>
+          </div>
+
+          <div class="space-y-3.5 text-sm">
+            <!-- Buyer Phone Field (Added as requested) -->
+            <div class="p-3.5 rounded-xl bg-indigo-950/40 border border-indigo-500/30 flex flex-wrap items-center justify-between gap-2">
+              <div class="min-w-0 flex-1">
+                <span class="text-xs text-indigo-300 block mb-0.5">📞 رقم هاتف المشتري المسجل:</span>
+                <strong id="displayBuyerPhone" dir="ltr" class="text-white font-mono font-bold text-sm sm:text-base block text-right sm:text-right">+212666128786</strong>
+              </div>
+              <button type="button" data-copy-target="displayBuyerPhone" class="copy-field-btn px-3 py-1.5 rounded-lg bg-indigo-600/30 hover:bg-indigo-600/40 text-xs text-indigo-200 font-semibold transition shrink-0">
+                نسخ الرقم
+              </button>
+            </div>
+
+            <!-- Name Field -->
+            <div class="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 flex flex-wrap items-center justify-between gap-2">
+              <div class="min-w-0 flex-1">
+                <span class="text-xs text-slate-400 block mb-0.5">الاسم الكامل لصاحب الحساب:</span>
+                <strong id="displayBankHolder" class="text-white font-bold text-sm sm:text-base block break-words">MOHAMED BOUCHIKHI</strong>
+              </div>
+              <button type="button" data-copy-target="displayBankHolder" class="copy-field-btn px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 font-semibold transition shrink-0">
+                نسخ
+              </button>
+            </div>
+
+            <!-- Bank Field -->
+            <div class="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 flex flex-wrap items-center justify-between gap-2">
+              <div class="min-w-0 flex-1">
+                <span class="text-xs text-slate-400 block mb-0.5">اسم البنك:</span>
+                <strong id="displayBankName" class="text-amber-300 font-bold text-sm sm:text-base block break-words">CIH</strong>
+              </div>
+              <button type="button" data-copy-target="displayBankName" class="copy-field-btn px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 font-semibold transition shrink-0">
+                نسخ
+              </button>
+            </div>
+
+            <!-- Account Number Field (Full visibility on all phones without cutting off digits) -->
+            <div class="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+              <div class="min-w-0 flex-1">
+                <span class="text-xs text-slate-400 block mb-1">رقم الحساب البنكي (RIB / IBAN):</span>
+                <strong id="displayBankRib" dir="ltr" class="text-emerald-400 font-mono font-bold text-xs sm:text-base block break-all sm:break-words text-left bg-slate-900/90 px-2.5 py-2 rounded-lg border border-slate-800/80 select-all">230 480 7097973231009200 32</strong>
+              </div>
+              <button type="button" data-copy-target="displayBankRib" class="copy-field-btn w-full sm:w-auto px-3.5 py-2 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/30 text-xs text-emerald-300 font-bold transition shrink-0 text-center">
+                نسخ الرقم
+              </button>
+            </div>
+          </div>
+
+          <div class="mt-4 p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-xs text-indigo-200 leading-relaxed">
+            💡 بعد إجراء التحويل البنكي بالمجموع النهائي <strong id="bankTransferAmountHint" class="text-white">0 درهم مغربي</strong>، أرسل وصل التحويل للبائع عبر الواتساب لتفعيل اشتراكك فوراً.
+          </div>
+        </div>
+
+      </section>
+    </div>
+
+  </main>
+
+  <!-- Footer (Includes discreet Seller lock icon so buyers don't notice it, while Seller can click it anytime) -->
+  <footer class="relative z-10 border-t border-slate-900 bg-slate-950/80 py-6 text-center text-xs text-slate-500">
+    <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <p>جميع الحقوق محفوظة © 2026 — بوابة بيع الاشتراكات الرقمية الاحترافية</p>
+      <div class="flex items-center gap-2">
+        <p class="text-slate-600">حماية المعطيات البنكية بنظام كود التفعيل المباشر</p>
+        <button id="openSettingsBtn" type="button" class="text-slate-700 hover:text-slate-400 p-1 rounded transition" title="إدارة المتجر">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+        </button>
+      </div>
+    </div>
+  </footer>
+
+  <script id="sellerEmbeddedConfigScript">
+    window.__EMBEDDED_SELLER_CONFIG__ = {
+      sellerPin: '1234',
+      sellerPhone: '212600000000',
+      secretCode: 'PRO2026',
+      bankHolder: 'MOHAMED BOUCHIKHI',
+      bankName: 'CIH',
+      bankRib: '230 480 7097973231009200 32',
+      updatedAt: 1793520000000
+    };
+  </script>
+
+  <script>
+    (function () {
+      // Product Catalog matching exact user prompt prices and names
+      const PRODUCTS = {
+        'gemini-personal': {
+          id: 'gemini-personal',
+          name: 'جيميني برو الشخصي (عرض 18 شهراً + 5To + Google Tools IA)',
+          shortName: 'جيميني برو الشخصي',
+          unitPrice: 100,
+          priceLabel: '100 درهم مغربي'
+        },
+        'gemini-family': {
+          id: 'gemini-family',
+          name: 'جيميني برو العائلي (عرض 18 شهراً + 5To + Google Tools IA)',
+          shortName: 'جيميني برو العائلي',
+          unitPrice: 50,
+          priceLabel: '50 درهم مغربي'
+        },
+        'canva-pro': {
+          id: 'canva-pro',
+          name: 'كانفا برو',
+          shortName: 'كانفا برو',
+          unitPrice: 20,
+          priceLabel: '20 درهم مغربي'
+        }
+      };
+
+      const PRODUCT_ORDER = ['gemini-personal', 'gemini-family', 'canva-pro'];
+
+      // Pure Factory Default Configuration with MOHAMED BOUCHIKHI's official CIH Bank details
+      const FACTORY_DEFAULT_CONFIG = {
+        sellerPin: '1234',
+        sellerPhone: '212600000000',
+        secretCode: 'PRO2026',
+        bankHolder: 'MOHAMED BOUCHIKHI',
+        bankName: 'CIH',
+        bankRib: '230 480 7097973231009200 32',
+        updatedAt: 1793520000000
+      };
+
+      let DEFAULT_CONFIG = Object.assign(
+        {},
+        FACTORY_DEFAULT_CONFIG,
+        window.__EMBEDDED_SELLER_CONFIG__ || {}
+      );
+
+      let sellerConfig = { ...DEFAULT_CONFIG };
+
+      // Cart starts completely empty (0 DH) so the buyer can explore products first!
+      let cart = {};
+      let isInlineCartOpen = true;
+      let isCodeVerified = false;
+
+      // Load saved seller config safely, purging any old demo data ("محمد الأمين العلوي") from browser storage
+      function loadConfig() {
+        const embedded = window.__EMBEDDED_SELLER_CONFIG__ || FACTORY_DEFAULT_CONFIG;
+        try {
+          // Clear legacy storage keys that held the old demo name
+          localStorage.removeItem('digital_store_seller_cfg_v3');
+          localStorage.removeItem('digital_store_seller_cfg_v4');
+
+          const savedV5 = localStorage.getItem('digital_store_seller_cfg_v5');
+          if (savedV5) {
+            const parsed = JSON.parse(savedV5);
+            // Never allow old demo placeholder to override MOHAMED BOUCHIKHI
+            if (parsed.bankHolder === 'محمد الأمين العلوي' || parsed.bankRib === '230 780 4512987600012345 67') {
+              sellerConfig = { ...FACTORY_DEFAULT_CONFIG, ...embedded };
+              localStorage.setItem('digital_store_seller_cfg_v5', JSON.stringify(sellerConfig));
+            } else {
+              const parsedTime = Number(parsed.updatedAt || 0);
+              const embeddedTime = Number(embedded.updatedAt || 0);
+              if (embeddedTime >= parsedTime) {
+                sellerConfig = { ...FACTORY_DEFAULT_CONFIG, ...embedded };
+              } else {
+                sellerConfig = { ...FACTORY_DEFAULT_CONFIG, ...embedded, ...parsed };
+              }
+            }
+          } else {
+            sellerConfig = { ...FACTORY_DEFAULT_CONFIG, ...embedded };
+          }
+        } catch (err) {
+          sellerConfig = { ...FACTORY_DEFAULT_CONFIG, ...embedded };
+        }
+        DEFAULT_CONFIG = { ...sellerConfig };
+      }
+
+      // DOM Elements
+      const productCards = document.querySelectorAll('.product-card');
+      const selectAllProductsBtn = document.getElementById('selectAllProductsBtn');
+      const downloadStandaloneHtmlBtn = document.getElementById('downloadStandaloneHtmlBtn');
+
+      // Header & Modal Cart Elements
+      const openCartModalBtn = document.getElementById('openCartModalBtn');
+      const closeCartModalBtn = document.getElementById('closeCartModalBtn');
+      const cartModal = document.getElementById('cartModal');
+      const modalCartItemsList = document.getElementById('modalCartItemsList');
+      const modalCartTotalPrice = document.getElementById('modalCartTotalPrice');
+      const clearCartBtn = document.getElementById('clearCartBtn');
+      const proceedFromCartBtn = document.getElementById('proceedFromCartBtn');
+      const headerCartCountBadge = document.getElementById('headerCartCountBadge');
+      const headerCartTotalBadge = document.getElementById('headerCartTotalBadge');
+
+      // Inline Cart Elements
+      const toggleInlineCartBtn = document.getElementById('toggleInlineCartBtn');
+      const inlineCartCountBadge = document.getElementById('inlineCartCountBadge');
+      const inlineCartSummarySubtitle = document.getElementById('inlineCartSummarySubtitle');
+      const inlineCartTotalPrice = document.getElementById('inlineCartTotalPrice');
+      const inlineCartChevron = document.getElementById('inlineCartChevron');
+      const inlineCartDrawerBody = document.getElementById('inlineCartDrawerBody');
+      const inlineCartItemsContainer = document.getElementById('inlineCartItemsContainer');
+      const inlineCartFooterTotal = document.getElementById('inlineCartFooterTotal');
+
+      // Checkout & WhatsApp Elements
+      const summaryProductName = document.getElementById('summaryProductName');
+      const summaryProductPrice = document.getElementById('summaryProductPrice');
+      const buyerPhoneInput = document.getElementById('buyerPhoneInput');
+      const phoneErrorMsg = document.getElementById('phoneErrorMsg');
+      const whatsappPreviewText = document.getElementById('whatsappPreviewText');
+      const sendWhatsappBtn = document.getElementById('sendWhatsappBtn');
+
+      // Secret Code Elements
+      const secretCodeInput = document.getElementById('secretCodeInput');
+      const verifyCodeBtn = document.getElementById('verifyCodeBtn');
+      const codeFeedbackMsg = document.getElementById('codeFeedbackMsg');
+      const bankLockedBox = document.getElementById('bankLockedBox');
+      const bankUnlockedBox = document.getElementById('bankUnlockedBox');
+      const lockAgainBtn = document.getElementById('lockAgainBtn');
+
+      const displayBankHolder = document.getElementById('displayBankHolder');
+      const displayBankName = document.getElementById('displayBankName');
+      const displayBankRib = document.getElementById('displayBankRib');
+      const displayBuyerPhone = document.getElementById('displayBuyerPhone');
+      const bankTransferAmountHint = document.getElementById('bankTransferAmountHint');
+
+      // Settings Modal & PIN Gate Elements
+      const sellerSettingsModal = document.getElementById('sellerSettingsModal');
+      const openSettingsBtn = document.getElementById('openSettingsBtn');
+      const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+      const sellerPinGateView = document.getElementById('sellerPinGateView');
+      const sellerConfigFormView = document.getElementById('sellerConfigFormView');
+      const sellerPinInput = document.getElementById('sellerPinInput');
+      const sellerPinErrorMsg = document.getElementById('sellerPinErrorMsg');
+      const unlockSellerSettingsBtn = document.getElementById('unlockSellerSettingsBtn');
+      const lockSettingsViewBtn = document.getElementById('lockSettingsViewBtn');
+
+      const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+      const saveAndDownloadSettingsBtn = document.getElementById('saveAndDownloadSettingsBtn');
+      const resetSettingsBtn = document.getElementById('resetSettingsBtn');
+      const clearFieldsForNewDataBtn = document.getElementById('clearFieldsForNewDataBtn');
+      const cfgSellerPin = document.getElementById('cfgSellerPin');
+      const cfgSellerPhone = document.getElementById('cfgSellerPhone');
+      const cfgSecretCode = document.getElementById('cfgSecretCode');
+      const cfgBankHolder = document.getElementById('cfgBankHolder');
+      const cfgBankName = document.getElementById('cfgBankName');
+      const cfgBankRib = document.getElementById('cfgBankRib');
+
+      function renderSellerDetails() {
+        displayBankHolder.textContent = sellerConfig.bankHolder;
+        displayBankName.textContent = sellerConfig.bankName;
+        displayBankRib.textContent = sellerConfig.bankRib;
+        
+        const enteredPhone = buyerPhoneInput.value.trim();
+        displayBuyerPhone.textContent = enteredPhone || '+212666128786';
+
+        // Also bake the current values into the HTML input attributes so exported HTML files contain the new values
+        cfgSellerPin.setAttribute('value', sellerConfig.sellerPin || '1234');
+        cfgSellerPhone.setAttribute('value', sellerConfig.sellerPhone || '');
+        cfgSecretCode.setAttribute('value', sellerConfig.secretCode || '');
+        cfgBankHolder.setAttribute('value', sellerConfig.bankHolder || '');
+        cfgBankName.setAttribute('value', sellerConfig.bankName || '');
+        cfgBankRib.setAttribute('value', sellerConfig.bankRib || '');
+      }
+
+      function saveConfig() {
+        sellerConfig.updatedAt = Date.now();
+        DEFAULT_CONFIG = { ...sellerConfig };
+        window.__EMBEDDED_SELLER_CONFIG__ = { ...sellerConfig };
+
+        try {
+          localStorage.setItem('digital_store_seller_cfg_v5', JSON.stringify(sellerConfig));
+        } catch (err) {
+          // Ignore storage restrictions in sandboxed iframe
+        }
+
+        // Update the embedded config script tag so downloading the HTML preserves the new Bank & Secret Code permanently
+        const embeddedScript = document.getElementById('sellerEmbeddedConfigScript');
+        if (embeddedScript) {
+          embeddedScript.textContent = '\n    window.__EMBEDDED_SELLER_CONFIG__ = ' + JSON.stringify(sellerConfig, null, 2) + ';\n  ';
+        }
+
+        renderSellerDetails();
+      }
+
+      function showToast(message, type) {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        const bgClass = type === 'error'
+          ? 'bg-rose-950/95 border-rose-500/50 text-rose-200'
+          : 'bg-slate-900/95 border-emerald-500/50 text-emerald-300';
+        toast.className = `pointer-events-auto border px-4 py-3 rounded-xl shadow-2xl text-xs sm:text-sm font-bold flex items-center justify-between gap-3 transition-all duration-300 ${bgClass}`;
+        toast.innerHTML = `<span>${message}</span>`;
+        container.appendChild(toast);
+        setTimeout(() => {
+          toast.style.opacity = '0';
+          setTimeout(() => toast.remove(), 300);
+        }, 3400);
+      }
+
+      function getCartItemsArray() {
+        const items = [];
+        PRODUCT_ORDER.forEach((id) => {
+          const qty = cart[id] || 0;
+          if (qty > 0 && PRODUCTS[id]) {
+            items.push({
+              ...PRODUCTS[id],
+              qty,
+              subtotal: PRODUCTS[id].unitPrice * qty
+            });
+          }
+        });
+        return items;
+      }
+
+      function getCartTotals() {
+        const items = getCartItemsArray();
+        const totalQty = items.reduce((acc, item) => acc + item.qty, 0);
+        const totalPrice = items.reduce((acc, item) => acc + item.subtotal, 0);
+        return { items, totalQty, totalPrice };
+      }
+
+      // Build WhatsApp message supporting 1 or multiple products with final total
+      function buildWhatsappMessage() {
+        const { items, totalPrice } = getCartTotals();
+        const buyerPhone = buyerPhoneInput.value.trim() || '[أدخل رقم هاتفك]';
+
+        if (items.length === 0) {
+          return 'المرجو اختيار منتوج واحد على الأقل وإضافته إلى سلة المشتريات.';
+        }
+
+        const itemsDescription = items
+          .map((item) => item.qty > 1 ? `${item.name} (×${item.qty} = ${item.subtotal} درهم مغربي)` : `${item.name} (${item.priceLabel})`)
+          .join(' + ');
+
+        return `أريد شراء ${itemsDescription} بالمجموع النهائي ${totalPrice} درهم مغربي ورقم الهاتف ${buyerPhone}، المرجو أن ترسل لي كود التفعيل.`;
+      }
+
+      function renderCartRowsHTML(items) {
+        if (items.length === 0) {
+          return `
+            <div class="p-6 rounded-2xl bg-slate-900/60 border border-dashed border-slate-800 text-center">
+              <p class="text-sm font-bold text-slate-400 mb-1">سلة المشتريات فارغة حالياً</p>
+              <p class="text-xs text-slate-500">انقر على أي منتوج أعلاه لإضافته إلى السلة</p>
+            </div>
+          `;
+        }
+
+        return items.map((item) => `
+          <div class="p-3 sm:p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex items-start sm:items-center gap-2.5 min-w-0">
+              <span class="w-8 h-8 rounded-xl bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 font-black text-xs flex items-center justify-center shrink-0">${item.qty}×</span>
+              <div class="min-w-0 flex-1">
+                <h4 class="text-xs sm:text-sm font-extrabold text-white break-words leading-snug">${item.name}</h4>
+                <span class="text-[11px] sm:text-xs text-slate-400 block mt-0.5">ثمن الوحدة: ${item.priceLabel}</span>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto pt-2 sm:pt-0 border-t border-slate-800/70 sm:border-0">
+              <div class="flex items-center bg-slate-950 border border-slate-800 rounded-xl p-1">
+                <button type="button" data-cart-action="dec" data-id="${item.id}" class="w-7 h-7 rounded-lg hover:bg-slate-800 text-slate-300 font-bold text-sm flex items-center justify-center transition" title="إنقاص الكمية">−</button>
+                <span class="px-2.5 text-xs font-extrabold text-white">${item.qty}</span>
+                <button type="button" data-cart-action="inc" data-id="${item.id}" class="w-7 h-7 rounded-lg hover:bg-slate-800 text-indigo-400 font-bold text-sm flex items-center justify-center transition" title="زيادة الكمية">+</button>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-sm sm:text-base font-black text-emerald-400 min-w-[90px] text-left">${item.subtotal} درهم مغربي</span>
+                <button type="button" data-cart-action="remove" data-id="${item.id}" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition" title="حذف من السلة">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      function renderAll() {
+        const { items, totalQty, totalPrice } = getCartTotals();
+        const formattedTotal = `${totalPrice} درهم مغربي`;
+
+        // Update Product Cards state (Multi-selection)
+        productCards.forEach((card) => {
+          const id = card.getAttribute('data-product-id');
+          const qty = cart[id] || 0;
+          const indicator = card.querySelector('.check-indicator');
+          const icon = indicator.querySelector('svg');
+          const btn = card.querySelector('.select-btn');
+
+          if (qty > 0) {
+            card.classList.add('selected');
+            indicator.classList.remove('border-slate-600');
+            indicator.classList.add('border-indigo-500', 'bg-indigo-600');
+            icon.classList.remove('hidden');
+            btn.textContent = qty > 1 ? `مضاف إلى السلة ✓ (انقر للإزالة) (${qty} في السلة)` : 'مضاف إلى السلة ✓ (انقر للإزالة)';
+            btn.className = 'select-btn w-full py-2.5 rounded-xl font-bold text-sm transition bg-indigo-600 text-white shadow-lg shadow-indigo-600/25';
+          } else {
+            card.classList.remove('selected');
+            indicator.classList.add('border-slate-600');
+            indicator.classList.remove('border-indigo-500', 'bg-indigo-600');
+            icon.classList.add('hidden');
+            btn.textContent = '+ أضف إلى السلة';
+            btn.className = 'select-btn w-full py-2.5 rounded-xl font-bold text-sm transition bg-slate-800 hover:bg-slate-700 text-slate-200';
+          }
+        });
+
+        // Summary text
+        const summaryNamesText = items.length > 0
+          ? items.map((item) => item.qty > 1 ? `${item.shortName} (×${item.qty})` : item.shortName).join(' + ')
+          : 'لم يتم اختيار أي منتوج بعد';
+
+        // Header badges
+        headerCartCountBadge.textContent = totalQty;
+        headerCartTotalBadge.textContent = formattedTotal;
+
+        // Inline Cart Section
+        inlineCartCountBadge.textContent = totalQty;
+        inlineCartSummarySubtitle.textContent = summaryNamesText;
+        inlineCartTotalPrice.textContent = formattedTotal;
+        inlineCartFooterTotal.textContent = formattedTotal;
+        inlineCartItemsContainer.innerHTML = renderCartRowsHTML(items);
+
+        // Modal Cart Section
+        modalCartItemsList.innerHTML = renderCartRowsHTML(items);
+        modalCartTotalPrice.textContent = formattedTotal;
+
+        // Checkout & Bank Summary
+        summaryProductName.textContent = summaryNamesText;
+        summaryProductPrice.textContent = formattedTotal;
+        bankTransferAmountHint.textContent = formattedTotal;
+
+        whatsappPreviewText.textContent = buildWhatsappMessage();
+      }
+
+      // Handle quantity / removal clicks inside both inline cart and modal cart via event delegation
+      function handleCartActionClick(e) {
+        const actionBtn = e.target.closest('[data-cart-action]');
+        if (!actionBtn) return;
+
+        const action = actionBtn.getAttribute('data-cart-action');
+        const id = actionBtn.getAttribute('data-id');
+        if (!id || !PRODUCTS[id]) return;
+
+        const currentQty = cart[id] || 0;
+        if (action === 'inc') {
+          cart[id] = currentQty + 1;
+        } else if (action === 'dec') {
+          if (currentQty <= 1) {
+            delete cart[id];
+          } else {
+            cart[id] = currentQty - 1;
+          }
+        } else if (action === 'remove') {
+          delete cart[id];
+        }
+        renderAll();
+      }
+
+      inlineCartItemsContainer.addEventListener('click', handleCartActionClick);
+      modalCartItemsList.addEventListener('click', handleCartActionClick);
+
+      // Toggle Product in Cart when clicking a Product Card
+      productCards.forEach((card) => {
+        card.addEventListener('click', () => {
+          const id = card.getAttribute('data-product-id');
+          if (cart[id] && cart[id] > 0) {
+            delete cart[id];
+            showToast(`تمت إزالة "${PRODUCTS[id].shortName}" من السلة`, 'info');
+          } else {
+            cart[id] = 1;
+            showToast(`تمت إضافة "${PRODUCTS[id].shortName}" إلى السلة!`, 'success');
+          }
+          renderAll();
+        });
+      });
+
+      // Select All Products Button
+      selectAllProductsBtn.addEventListener('click', () => {
+        PRODUCT_ORDER.forEach((id) => {
+          if (!cart[id] || cart[id] < 1) {
+            cart[id] = 1;
+          }
+        });
+        renderAll();
+        showToast('تمت إضافة جميع المنتوجات إلى سلة المشتريات!', 'success');
+      });
+
+      // Helper to export clean standalone .html file that opens directly in Chrome (with updated Bank Details & locked state for buyers)
+      function triggerStandaloneHtmlDownload() {
+        saveConfig();
+
+        // Ensure modals and bank box are in clean locked state in the downloaded file for buyers
+        const wasBankUnlocked = !bankUnlockedBox.classList.contains('hidden');
+        sellerSettingsModal.classList.add('hidden');
+        sellerSettingsModal.classList.remove('flex');
+        sellerPinGateView.classList.remove('hidden');
+        sellerConfigFormView.classList.add('hidden');
+        bankUnlockedBox.classList.add('hidden');
+        bankLockedBox.classList.remove('hidden');
+
+        const htmlContent = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+
+        // Restore bank unlocked preview for the seller if it was open
+        if (wasBankUnlocked) {
+          bankLockedBox.classList.add('hidden');
+          bankUnlockedBox.classList.remove('hidden');
+        }
+
+        const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'digital_subscriptions_store.html';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 1500);
+        showToast('تم تنزيل ملف HTML محدث بمعطياتك البنكية الجديدة والرقم السري!', 'success');
+      }
+
+      downloadStandaloneHtmlBtn.addEventListener('click', triggerStandaloneHtmlDownload);
+
+      // Toggle Inline Cart Drawer on Click
+      toggleInlineCartBtn.addEventListener('click', () => {
+        isInlineCartOpen = !isInlineCartOpen;
+        if (isInlineCartOpen) {
+          inlineCartDrawerBody.classList.remove('hidden');
+          inlineCartChevron.classList.add('rotate-180');
+        } else {
+          inlineCartDrawerBody.classList.add('hidden');
+          inlineCartChevron.classList.remove('rotate-180');
+        }
+      });
+
+      // Header Cart Modal Open / Close
+      openCartModalBtn.addEventListener('click', () => {
+        cartModal.classList.remove('hidden');
+        cartModal.classList.add('flex');
+      });
+
+      function closeCartModal() {
+        cartModal.classList.add('hidden');
+        cartModal.classList.remove('flex');
+      }
+
+      closeCartModalBtn.addEventListener('click', closeCartModal);
+      cartModal.addEventListener('click', (e) => {
+        if (e.target === cartModal) closeCartModal();
+      });
+
+      clearCartBtn.addEventListener('click', () => {
+        cart = {};
+        renderAll();
+        showToast('تم إفراغ سلة المشتريات', 'info');
+      });
+
+      proceedFromCartBtn.addEventListener('click', () => {
+        closeCartModal();
+        document.getElementById('checkoutSection').scrollIntoView({ behavior: 'smooth' });
+        buyerPhoneInput.focus();
+      });
+
+      function verifySecretCode() {
+        const entered = secretCodeInput.value.trim();
+        if (!entered) {
+          codeFeedbackMsg.textContent = 'المرجو إدخال كود التفعيل المرسل من البائع أولاً.';
+          codeFeedbackMsg.className = 'text-xs mt-2.5 text-rose-400 font-semibold block';
+          return;
+        }
+
+        if (entered.toUpperCase() === sellerConfig.secretCode.trim().toUpperCase()) {
+          isCodeVerified = true;
+          renderSellerDetails();
+          codeFeedbackMsg.textContent = 'الكود السري صحيح! تم إظهار المعطيات البنكية للبائع ورقم هاتفك أسفله.';
+          codeFeedbackMsg.className = 'text-xs mt-2.5 text-emerald-400 font-bold block';
+          bankLockedBox.classList.add('hidden');
+          bankUnlockedBox.classList.remove('hidden');
+          showToast('تم التحقق من الكود بنجاح وإظهار المعطيات البنكية!', 'success');
+        } else {
+          isCodeVerified = false;
+          codeFeedbackMsg.textContent = 'كود التفعيل غير صحيح. تأكد من الكود الذي أرسله لك البائع عبر الواتساب.';
+          codeFeedbackMsg.className = 'text-xs mt-2.5 text-rose-400 font-bold block';
+          bankUnlockedBox.classList.add('hidden');
+          bankLockedBox.classList.remove('hidden');
+          showToast('كود التفعيل غير صحيح!', 'error');
+        }
+      }
+
+      // Live update WhatsApp message on phone input
+      buyerPhoneInput.addEventListener('input', () => {
+        const val = buyerPhoneInput.value.trim();
+        if (val.length >= 6) {
+          phoneErrorMsg.classList.add('hidden');
+        }
+        if (displayBuyerPhone) {
+          displayBuyerPhone.textContent = val || '+212666128786';
+        }
+        whatsappPreviewText.textContent = buildWhatsappMessage();
+      });
+
+      // Send WhatsApp Button Handler
+      sendWhatsappBtn.addEventListener('click', () => {
+        const { items } = getCartTotals();
+        if (items.length === 0) {
+          showToast('المرجو اختيار منتوج واحد على الأقل في السلة أولاً!', 'error');
+          return;
+        }
+
+        const buyerPhone = buyerPhoneInput.value.trim();
+        if (!buyerPhone || buyerPhone.length < 6) {
+          phoneErrorMsg.classList.remove('hidden');
+          buyerPhoneInput.focus();
+          showToast('المرجو إدخال رقم هاتف المشتري أولاً', 'error');
+          return;
+        }
+        phoneErrorMsg.classList.add('hidden');
+
+        const message = buildWhatsappMessage();
+        const cleanSellerPhone = sellerConfig.sellerPhone.replace(/[^0-9]/g, '');
+        const whatsappUrl = `https://wa.me/${cleanSellerPhone}?text=${encodeURIComponent(message)}`;
+        window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+        showToast('تم فتح الواتساب لإرسال طلب الشراء للبائع', 'success');
+      });
+
+      // Verify Code Button & Enter Key
+      verifyCodeBtn.addEventListener('click', verifySecretCode);
+      secretCodeInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          verifySecretCode();
+        }
+      });
+
+      // Lock Again Button
+      lockAgainBtn.addEventListener('click', () => {
+        isCodeVerified = false;
+        secretCodeInput.value = '';
+        codeFeedbackMsg.classList.add('hidden');
+        bankUnlockedBox.classList.add('hidden');
+        bankLockedBox.classList.remove('hidden');
+      });
+
+      // Copy Bank Details Buttons
+      document.querySelectorAll('.copy-field-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const targetId = btn.getAttribute('data-copy-target');
+          const textToCopy = document.getElementById(targetId).textContent.trim();
+
+          const fallbackCopy = (text) => {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            try {
+              document.execCommand('copy');
+              showToast('تم نسخ البيانات بنجاح!', 'success');
+            } catch (err) {
+              showToast('تعذر النسخ التلقائي', 'error');
+            }
+            document.body.removeChild(ta);
+          };
+
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(textToCopy).then(() => {
+              showToast('تم نسخ البيانات بنجاح!', 'success');
+            }).catch(() => fallbackCopy(textToCopy));
+          } else {
+            fallbackCopy(textToCopy);
+          }
+        });
+      });
+
+      // Populate form fields from sellerConfig
+      function populateSellerFormFields() {
+        cfgSellerPin.value = sellerConfig.sellerPin || '1234';
+        cfgSellerPhone.value = sellerConfig.sellerPhone || '';
+        cfgSecretCode.value = sellerConfig.secretCode || '';
+        cfgBankHolder.value = sellerConfig.bankHolder || '';
+        cfgBankName.value = sellerConfig.bankName || '';
+        cfgBankRib.value = sellerConfig.bankRib || '';
+      }
+
+      // Perform Full Reset of Seller Settings & Unlock Form for Immediate Editing
+      function executeSellerResetAndUnlock() {
+        try {
+          localStorage.removeItem('digital_store_seller_cfg_v5');
+          localStorage.removeItem('digital_store_seller_cfg_v4');
+          localStorage.removeItem('digital_store_seller_cfg_v3');
+        } catch (err) {
+          // Ignore storage restrictions
+        }
+        sellerConfig = { ...FACTORY_DEFAULT_CONFIG, updatedAt: Date.now() };
+        saveConfig();
+        populateSellerFormFields();
+
+        // Ensure form is unlocked and visible
+        sellerPinErrorMsg.classList.add('hidden');
+        sellerPinGateView.classList.add('hidden');
+        sellerConfigFormView.classList.remove('hidden');
+
+        // Focus & select Bank Holder input so seller can immediately type their new bank details & PIN
+        setTimeout(() => {
+          cfgBankHolder.focus();
+          cfgBankHolder.select();
+        }, 60);
+
+        showToast('تمت استعادة معطياتك البنكية الأساسية (MOHAMED BOUCHIKHI - CIH)!', 'success');
+      }
+
+      function openSellerSettingsModal() {
+        sellerSettingsModal.classList.remove('hidden');
+        sellerSettingsModal.classList.add('flex');
+        sellerPinErrorMsg.classList.add('hidden');
+        sellerPinInput.value = '';
+
+        // Always require Seller PIN before showing settings
+        sellerPinGateView.classList.remove('hidden');
+        sellerConfigFormView.classList.add('hidden');
+        setTimeout(() => sellerPinInput.focus(), 80);
+      }
+
+      // Seller Settings Modal Trigger (Discreet lock icon in footer)
+      if (openSettingsBtn) {
+        openSettingsBtn.addEventListener('click', openSellerSettingsModal);
+      }
+
+      function unlockSellerFormDirectly() {
+        sellerPinErrorMsg.classList.add('hidden');
+        populateSellerFormFields();
+        sellerPinGateView.classList.add('hidden');
+        sellerConfigFormView.classList.remove('hidden');
+        showToast('تم فتح قفل إعدادات البائع بنجاح!', 'success');
+      }
+
+      function verifySellerPinAndUnlock() {
+        const enteredPin = sellerPinInput.value.trim();
+        const currentPin = (sellerConfig.sellerPin || '1234').trim();
+        if (enteredPin === currentPin) {
+          unlockSellerFormDirectly();
+        } else {
+          sellerPinErrorMsg.classList.remove('hidden');
+          showToast('الرقم السري غير صحيح!', 'error');
+        }
+      }
+
+      unlockSellerSettingsBtn.addEventListener('click', verifySellerPinAndUnlock);
+
+      lockSettingsViewBtn.addEventListener('click', () => {
+        sellerConfigFormView.classList.add('hidden');
+        sellerPinGateView.classList.remove('hidden');
+        sellerPinInput.value = '';
+        showToast('تم إغلاق قفل الإعدادات', 'info');
+      });
+
+      sellerPinInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          verifySellerPinAndUnlock();
+        }
+      });
+
+      function closeSettingsModal() {
+        sellerSettingsModal.classList.add('hidden');
+        sellerSettingsModal.classList.remove('flex');
+      }
+
+      closeSettingsBtn.addEventListener('click', closeSettingsModal);
+      sellerSettingsModal.addEventListener('click', (e) => {
+        if (e.target === sellerSettingsModal) closeSettingsModal();
+      });
+
+      // Apply & Save Seller Form Values and show updated bank card immediately so seller can verify
+      function applyAndSaveSellerSettings() {
+        const chosenPin = cfgSellerPin.value.trim();
+        const chosenSecretCode = cfgSecretCode.value.trim();
+        const chosenBankHolder = cfgBankHolder.value.trim();
+        const chosenBankName = cfgBankName.value.trim();
+        const chosenBankRib = cfgBankRib.value.trim();
+        const chosenSellerPhone = cfgSellerPhone.value.trim();
+
+        if (!chosenBankHolder || !chosenBankName || !chosenBankRib) {
+          showToast('المرجو ملء الاسم الكامل واسم البنك ورقم الحساب البنكي (RIB) قبل الحفظ!', 'error');
+          return false;
+        }
+
+        sellerConfig = {
+          sellerPin: chosenPin || '1234',
+          sellerPhone: chosenSellerPhone || '212600000000',
+          secretCode: chosenSecretCode || 'PRO2026',
+          bankHolder: chosenBankHolder,
+          bankName: chosenBankName,
+          bankRib: chosenBankRib,
+          updatedAt: Date.now()
+        };
+
+        saveConfig();
+        closeSettingsModal();
+
+        // Automatically unlock and display the updated bank box so the seller sees their new bank details right away!
+        bankLockedBox.classList.add('hidden');
+        bankUnlockedBox.classList.remove('hidden');
+        codeFeedbackMsg.textContent = '✓ تم تحديث وحفظ معطياتك البنكية الجديدة بنجاح! (اضغط على "إخفاء" لقفلها أمام المشتري)';
+        codeFeedbackMsg.className = 'text-xs mt-2.5 text-emerald-400 font-bold block';
+
+        showToast('تم حفظ وتحديث معطياتك البنكية والرقم السري بنجاح!', 'success');
+        return true;
+      }
+
+      saveSettingsBtn.addEventListener('click', () => {
+        applyAndSaveSellerSettings();
+      });
+
+      saveAndDownloadSettingsBtn.addEventListener('click', () => {
+        if (applyAndSaveSellerSettings()) {
+          triggerStandaloneHtmlDownload();
+        }
+      });
+
+      // Updated Reset Settings Button inside the Unlocked Form
+      resetSettingsBtn.addEventListener('click', executeSellerResetAndUnlock);
+
+      // Clear all fields so the seller can type fresh Bank Details & PIN from scratch
+      clearFieldsForNewDataBtn.addEventListener('click', () => {
+        cfgBankHolder.value = '';
+        cfgBankName.value = '';
+        cfgBankRib.value = '';
+        cfgSecretCode.value = '';
+        cfgSellerPhone.value = '';
+        cfgSellerPin.value = '';
+        cfgBankHolder.focus();
+        showToast('تم تفريغ جميع الحقول! اكتب الآن معطياتك البنكية ورقمك السري الجديد ثم اضغط على حفظ.', 'info');
+      });
+
+      // Initialize App
+      loadConfig();
+      renderSellerDetails();
+      renderAll();
+    })();
+  </script>
+</body>
+</html>
